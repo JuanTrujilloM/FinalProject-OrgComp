@@ -194,4 +194,17 @@ class Bird {
       }
       return;
    }
+   
+   /** Getters para obtener la posición y tamaño del pájaro */
+   method int getX() {
+      return x;
+   }
+   
+   method int getY() {
+      return y;
+   }
+   
+   method int getSize() {
+      return size;
+   }
 }
