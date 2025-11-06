@@ -1,0 +1,197 @@
+class Bird {
+
+   field int x, y; // screen location of the top-left corner of this Bird
+   field int size; // length of this Bird, in pixels
+
+   /** Constructs and draws a new Bird with a given location and size. */
+   constructor Bird new(int ax, int ay, int asize) {
+      let x = ax;
+      let y = ay;
+      let size = asize;
+      do draw();
+      return this;
+   }
+
+   /** Disposes this Bird. */
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   /** Draws this Bird in its current (x,y) location */
+   method void draw() {
+      var int memAddress;
+      // Map (x,y) to screen memory word address.
+      // Each word is 16 horizontal pixels, and each screen row has 32 words.
+      let memAddress = 16384 + (y * 32) + (x / 16);
+      // column 0
+      do Memory.poke(memAddress, -4096);
+      do Memory.poke(memAddress +32, -4096);
+      do Memory.poke(memAddress +64, 3840);
+      do Memory.poke(memAddress +96, 3840);
+      do Memory.poke(memAddress +128, 192);
+      do Memory.poke(memAddress +160, 192);
+      do Memory.poke(memAddress +192, 1020);
+      do Memory.poke(memAddress +224, 1020);
+      do Memory.poke(memAddress +256, 3075);
+      do Memory.poke(memAddress +288, 3075);
+      do Memory.poke(memAddress +320, 12291);
+      do Memory.poke(memAddress +352, 12291);
+      do Memory.poke(memAddress +384, 12291);
+      do Memory.poke(memAddress +416, 12291);
+      do Memory.poke(memAddress +448, 3084);
+      do Memory.poke(memAddress +480, 3084);
+      do Memory.poke(memAddress +512, 1008);
+      do Memory.poke(memAddress +544, 1008);
+      do Memory.poke(memAddress +576, 768);
+      do Memory.poke(memAddress +608, 768);
+      do Memory.poke(memAddress +640, 15360);
+      do Memory.poke(memAddress +672, 15360);
+      do Memory.poke(memAddress +704, -16384);
+      do Memory.poke(memAddress +736, -16384);
+      // column 1
+      do Memory.poke(memAddress +1, 63);
+      do Memory.poke(memAddress +33, 63);
+      do Memory.poke(memAddress +65, 204);
+      do Memory.poke(memAddress +97, 204);
+      do Memory.poke(memAddress +129, 771);
+      do Memory.poke(memAddress +161, 771);
+      do Memory.poke(memAddress +193, 3267);
+      do Memory.poke(memAddress +225, 3267);
+      do Memory.poke(memAddress +257, 3267);
+      do Memory.poke(memAddress +289, 3267);
+      do Memory.poke(memAddress +321, 3084);
+      do Memory.poke(memAddress +353, 3084);
+      do Memory.poke(memAddress +385, 16368);
+      do Memory.poke(memAddress +417, 16368);
+      do Memory.poke(memAddress +449, -16372);
+      do Memory.poke(memAddress +481, -16372);
+      do Memory.poke(memAddress +513, 16371);
+      do Memory.poke(memAddress +545, 16371);
+      do Memory.poke(memAddress +577, 12300);
+      do Memory.poke(memAddress +609, 12300);
+      do Memory.poke(memAddress +641, 16368);
+      do Memory.poke(memAddress +673, 16368);
+      do Memory.poke(memAddress +705, 15);
+      do Memory.poke(memAddress +737, 15);
+      return;
+   }
+
+   /** Erases this Bird. */
+   method void erase() {
+      var int memAddress;
+      // Erase the sprite by writing zeros to the same screen memory words
+      let memAddress = 16384 + (y * 32) + (x / 16);
+      // column 0
+      do Memory.poke(memAddress, 0);
+      do Memory.poke(memAddress + 32, 0);
+      do Memory.poke(memAddress + 64, 0);
+      do Memory.poke(memAddress + 96, 0);
+      do Memory.poke(memAddress + 128, 0);
+      do Memory.poke(memAddress + 160, 0);
+      do Memory.poke(memAddress + 192, 0);
+      do Memory.poke(memAddress + 224, 0);
+      do Memory.poke(memAddress + 256, 0);
+      do Memory.poke(memAddress + 288, 0);
+      do Memory.poke(memAddress + 320, 0);
+      do Memory.poke(memAddress + 352, 0);
+      do Memory.poke(memAddress + 384, 0);
+      do Memory.poke(memAddress + 416, 0);
+      do Memory.poke(memAddress + 448, 0);
+      do Memory.poke(memAddress + 480, 0);
+      do Memory.poke(memAddress + 512, 0);
+      do Memory.poke(memAddress + 544, 0);
+      do Memory.poke(memAddress + 576, 0);
+      do Memory.poke(memAddress + 608, 0);
+      do Memory.poke(memAddress + 640, 0);
+      do Memory.poke(memAddress + 672, 0);
+      do Memory.poke(memAddress + 704, 0);
+      do Memory.poke(memAddress + 736, 0);
+      // column 1
+      do Memory.poke(memAddress + 1, 0);
+      do Memory.poke(memAddress + 33, 0);
+      do Memory.poke(memAddress + 65, 0);
+      do Memory.poke(memAddress + 97, 0);
+      do Memory.poke(memAddress + 129, 0);
+      do Memory.poke(memAddress + 161, 0);
+      do Memory.poke(memAddress + 193, 0);
+      do Memory.poke(memAddress + 225, 0);
+      do Memory.poke(memAddress + 257, 0);
+      do Memory.poke(memAddress + 289, 0);
+      do Memory.poke(memAddress + 321, 0);
+      do Memory.poke(memAddress + 353, 0);
+      do Memory.poke(memAddress + 385, 0);
+      do Memory.poke(memAddress + 417, 0);
+      do Memory.poke(memAddress + 449, 0);
+      do Memory.poke(memAddress + 481, 0);
+      do Memory.poke(memAddress + 513, 0);
+      do Memory.poke(memAddress + 545, 0);
+      do Memory.poke(memAddress + 577, 0);
+      do Memory.poke(memAddress + 609, 0);
+      do Memory.poke(memAddress + 641, 0);
+      do Memory.poke(memAddress + 673, 0);
+      do Memory.poke(memAddress + 705, 0);
+      do Memory.poke(memAddress + 737, 0);
+      return;
+   }
+
+    /** Increments the Bird size by 2 pixels (if possible). */
+   method void incSize() {
+      if (((y + size) < 254) & ((x + size) < 510)) {
+         do erase();
+         let size = size + 2;
+         do draw();
+      }
+      return;
+   }
+
+   /** Decrements the Bird size by 2 pixels (if possible). */
+   method void decSize() {
+      if (size > 2) {
+         do erase();
+         let size = size - 2;
+         do draw();
+      }
+      return;
+   }
+
+   /** Moves this Bird up by 2 pixels (if possible). */
+   method void moveUp() {
+      if (y > 1) {
+         do erase();
+         let y = y - 2;
+         do draw();
+      }
+      return;
+   }
+
+   /** Moves the Bird down by 2 pixels (if possible). */
+   method void moveDown() {
+      if ((y + size) < 254) {
+         do erase();
+         let y = y + 2;
+         do draw();
+      }
+      return;
+   }
+
+   /** Moves the Bird left by 2 pixels (if possible). */
+   method void moveLeft() {
+      if (x > 1) {
+         do erase();
+         let x = x - 2;
+         do draw();
+      }
+      return;
+   }
+
+   /** Moves the Bird right by 2 pixels (if possible). */
+   method void moveRight() {
+      if ((x + size) < 510) {
+         do erase();
+         let x = x + 2;
+         do draw();
+      }
+      return;
+   }
+}

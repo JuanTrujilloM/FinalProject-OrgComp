@@ -1,0 +1,9 @@
+class Main {
+    function void main() {
+        var BirdGame game;
+        let game = BirdGame.new();
+        do game.run();
+        do game.dispose();
+        return;
+    }
+}
