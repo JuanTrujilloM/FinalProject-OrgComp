@@ -80,6 +80,10 @@ class BirdGame {
       let exit = false;
       
       while ((~exit) & (lives > 0)) {
+         // Mostrar título e instrucciones
+         do showTitle();
+         do updateLives();
+         do updateScore();
          // waits for a key to be pressed
          while (key = 0) {
             let key = Keyboard.keyPressed();
