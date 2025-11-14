@@ -208,10 +208,22 @@ class BirdGame {
                // Verificar colisión con avión
                if (obj.checkCollision(birdX, birdY, birdSize)) {
                   // Colisión con avión - restar una vida
-                  let lives = lives - 1;
-                  do updateLives();
+                  if (obj.type() = 0) {        // obstáculo
+                     let lives = lives - 1;
+                     do updateLives();
+                  }
+
+                  if (obj.type() = 1) {        // corazón
+                     let lives = lives + 1;
+                     do updateLives();
+                  }
+
+                  if (obj.type() = 2) {        // moneda
+                     let score = score + 5;
+                     do updateScore();
+                  }
+
                   do obj.deactivate();
-                  // Iniciar timer de reactivación (aproximadamente 1 segundo)
                   let reactivationTimer = 100;
                }
             }
@@ -224,39 +236,61 @@ class BirdGame {
    
    /** Crea un objeto aleatorio en una posición aleatoria */
    method void createRandomObject() {
-      var int i;
+      var int i, randomX, randomSpeed, r;
       var FallingObject newObj;
-      var int randomX, randomSpeed;
       var boolean created;
-      
-      // Buscar un slot vacío en el array
+      var int q, mod;
       let i = 0;
       let created = false;
+
       while ((i < maxObjects) & (~created)) {
+
          if (objects[i] = 0) {
-            // Generar valores "aleatorios" usando el índice del slot y objectCount
-            // Esto crea diferentes posiciones para cada slot
+
             let randomX = ((i * 97) + (objectCount * 37) + 50);
-            // Asegurar que X esté entre 0 y 480
-            while (randomX > 480) {
-               let randomX = randomX - 480;
-            }
-            while (randomX < 0) {
-               let randomX = randomX + 480;
-            }
+            while (randomX > 480) { let randomX = randomX - 480; }
+
+            let randomSpeed = 1;
+
+            // "Aleatorio" de tipo usando timeCounter (pseudo-random)
+            let r = timeCounter + (i * 3);
+
+            // calcular r % 10
             
-            let randomSpeed = 1;  
-            
-            // Crear solo aviones (tipo 0)
-            let newObj = FallingObject.new(randomX, 0, randomSpeed);
-            let objects[i] = newObj;
-            let created = true;
+            let q = r / 10;
+            let q = q * 10;
+            let mod = r - q;     // mod = r % 10
+
+            // 70% tipo 0
+            if (mod < 7) {
+               let newObj = FallingObject.new(randomX, 0, randomSpeed);
+               let objects[i] = newObj;
+               let created = true;
+            }
+            // 20% tipo 2
+            else {
+               // volver a calcular mod si quieres reutilizar, pero no es necesario
+               if (mod < 9) {
+                  let newObj = FallingObject.new(randomX, 2, randomSpeed);
+                  let objects[i] = newObj;
+                  let created = true;
+               }
+               // 10% tipo 1
+               else {
+                  let newObj = FallingObject.new(randomX, 1, randomSpeed);
+                  let objects[i] = newObj;
+                  let created = true;
+               }
+            }
+
          }
+
          let i = i + 1;
       }
-      
+
       return;
    }
+
 }
 
 

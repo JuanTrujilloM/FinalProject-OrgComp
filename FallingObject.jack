@@ -22,15 +22,26 @@ class FallingObject {
       do Memory.deAlloc(this);
       return;
    }
+   
+   /** type getter*/
+   method int type() {
+      return type;
+   }
 
    /** Dibuja el objeto según su tipo */
    method void draw() {
       if (~active) {
          return;
       }
-      
+
       if (type = 0) {
-         do drawAvion();  // Dibuja un avión
+         do drawAvion();
+      }
+      if (type = 1) {
+         do drawHeart();
+      }
+      if (type = 2) {
+         do drawCoin();
       }
       return;
    }
@@ -145,19 +156,62 @@ class FallingObject {
       return;
    }
 
+method void drawHeart() {
+   var int memAddress, location;
+
+   let location = (y * 32) + (x / 16);
+   let memAddress = 16384 + location;
+
+   // Un corazón simple en 16x16
+   do Memory.poke(memAddress + 32,   960);
+   do Memory.poke(memAddress + 64,  4032);
+   do Memory.poke(memAddress + 96,  8190);
+   do Memory.poke(memAddress +128, 16382);
+   do Memory.poke(memAddress +160, 16382);
+   do Memory.poke(memAddress +192,  8190);
+   do Memory.poke(memAddress +224,  4032);
+   do Memory.poke(memAddress +256,   960);
+
+   return;
+}
+
+method void drawCoin() {
+   var int memAddress, location;
+
+   let location = (y * 32) + (x / 16);
+   let memAddress = 16384 + location;
+
+   // Círculo 16x16
+   do Memory.poke(memAddress + 32,  480);
+   do Memory.poke(memAddress + 64, 2016);
+   do Memory.poke(memAddress + 96, 4032);
+   do Memory.poke(memAddress +128, 4032);
+   do Memory.poke(memAddress +160, 4032);
+   do Memory.poke(memAddress +192, 4032);
+   do Memory.poke(memAddress +224, 2016);
+   do Memory.poke(memAddress +256,  480);
+
+   return;
+}
+
    /** Borra el objeto */
    method void erase() {
-      var int x1, y1, x2, y2, centerX, centerY, radius;
-      
       if (~active) {
          return;
       }
-      
+
       if (type = 0) {
          do eraseAvion();
       }
+      if (type = 1) {
+         do eraseHeart();
+      }
+      if (type = 2) {
+         do eraseCoin();
+      }
       return;
    }
+
 
    /** Borra el avión usando Memory.poke */
    method void eraseAvion() {
@@ -268,6 +322,44 @@ class FallingObject {
       do Memory.poke(memAddress + 895, 0);
       return;
    }
+
+   method void eraseHeart() {
+      var int location, memAddress;
+
+      let location = (y * 32) + (x / 16);
+      let memAddress = 16384 + location;
+
+      do Memory.poke(memAddress + 32,  0);
+      do Memory.poke(memAddress + 64,  0);
+      do Memory.poke(memAddress + 96,  0);
+      do Memory.poke(memAddress +128,  0);
+      do Memory.poke(memAddress +160,  0);
+      do Memory.poke(memAddress +192,  0);
+      do Memory.poke(memAddress +224,  0);
+      do Memory.poke(memAddress +256,  0);
+
+      return;
+   }
+
+   method void eraseCoin() {
+      var int location, memAddress;
+
+      let location = (y * 32) + (x / 16);
+      let memAddress = 16384 + location;
+
+      do Memory.poke(memAddress + 32,  0);
+      do Memory.poke(memAddress + 64,  0);
+      do Memory.poke(memAddress + 96,  0);
+      do Memory.poke(memAddress +128,  0);
+      do Memory.poke(memAddress +160,  0);
+      do Memory.poke(memAddress +192,  0);
+      do Memory.poke(memAddress +224,  0);
+      do Memory.poke(memAddress +256,  0);
+
+      return;
+   }
+
+
 
    /** Actualiza la posición del objeto (lo hace caer) */
    method void fall() {
