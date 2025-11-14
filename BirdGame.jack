@@ -1,40 +1,54 @@
- 
 class BirdGame {
-   field Bird bird; // the Bird of this game
-   field int direction; // the Bird's current direction: 
-                        // 0=none, 1=up, 2=down, 3=left, 4=right
-   field Array objects; // Array de objetos cayendo
-   field int maxObjects; // Número máximo de objetos
-   field int objectCount; // Contador para crear nuevos objetos
-   field int lives; // Vidas del jugador
-   field int score; // Puntuación del jugador
-   field int timeCounter; // Contador de tiempo para el score
-   field int reactivationTimer; // Contador para reactivar objetos
+   field Bird bird;
+   field int direction;
+   
+   // Sistema de Aviones
+   field Array objects; 
+   field int maxObjects;
+   field int objectCount;
+   field int reactivationTimer;
+
+   // NUEVO: Sistema de Muros Horizontales
+   field Array horizontalWalls;
+   field int maxWalls;
+   field int wallCounter;
+
+   // Estado del juego
+   field int lives;
+   field int score;
+   field int timeCounter;
 
    /** Constructs a new Bird game. */
    constructor BirdGame new() {
       var int i;
-      // The initial Bird is located in the middle of the screen (256,128), has size 30, and is not moving.
       let bird = Bird.new(256, 128, 30);
       let direction = 0;
       
       // Inicializar sistema de objetos cayendo
-      let maxObjects = 5;  // Máximo 5 objetos en pantalla a la vez
+      let maxObjects = 5;
       let objects = Array.new(maxObjects);
       let objectCount = 0;
-      let lives = 3;  // Comenzar con 3 vidas
-      let score = 0;  // Comenzar con score 0
-      let timeCounter = 0;  // Inicializar contador de tiempo
-      let reactivationTimer = 0;  // Sin objetos por reactivar al inicio
+      let lives = 3;
+      let score = 0;
+      let timeCounter = 0;
+      let reactivationTimer = 0;
       
-      // Inicializar array con null
       let i = 0;
       while (i < maxObjects) {
-         let objects[i] = 0;  // null
+         let objects[i] = 0;
          let i = i + 1;
       }
+
+      // Inicializar sistema de muros horizontales (NUEVO)
+      let maxWalls = 3;
+      let horizontalWalls = Array.new(maxWalls);
+      let wallCounter = 0;
+      let i = 0;
+      while (i < maxWalls) {
+          let horizontalWalls[i] = 0;
+          let i = i + 1;
+      }
       
-      // Mostrar título e instrucciones
       do showTitle();
       do updateLives();
       do updateScore();
@@ -46,8 +60,9 @@ class BirdGame {
    method void dispose() {
       var int i;
       var FallingObject obj;
+      var HorizontalWall wall;
       
-      // Liberar todos los objetos
+      // Liberar todos los objetos (aviones)
       let i = 0;
       while (i < maxObjects) {
          let obj = objects[i];
@@ -57,7 +72,16 @@ class BirdGame {
          let i = i + 1;
       }
       
+      // Liberar todos los muros (NUEVO)
+      let i = 0;
+      while (i < maxWalls) {
+          let wall = horizontalWalls[i];
+          if (~(wall = 0)) { do wall.dispose(); }
+          let i = i + 1;
+      }
+      
       do objects.dispose();
+      do horizontalWalls.dispose(); // NUEVO
       do bird.dispose();
       do Memory.deAlloc(this);
       return;
@@ -75,7 +99,7 @@ class BirdGame {
 
    /** Runs the game: handles the user's inputs and moves the Bird accordingly */
    method void run() {
-      var char key;  // the key currently pressed by the user
+      var char key;
       var boolean exit;
       let exit = false;
       
@@ -84,27 +108,27 @@ class BirdGame {
          while (key = 0) {
             let key = Keyboard.keyPressed();
             do moveBird();
-            do updateObjects();  // Actualizar objetos cayendo
+            do updateObjects();
+            do updateWalls(); // NUEVO
          }
-         if (key = 81)  { let exit = true; }     // q key
-         if (key = 90)  { do bird.decSize(); } // z key
-         if (key = 88)  { do bird.incSize(); } // x key
-         if (key = 131) { let direction = 1; }   // up arrow
-         if (key = 133) { let direction = 2; }   // down arrow
-         if (key = 130) { let direction = 3; }   // left arrow
-         if (key = 132) { let direction = 4; }   // right arrow
+         if (key = 81)  { let exit = true; }
+         if (key = 90)  { do bird.decSize(); }
+         if (key = 88)  { do bird.incSize(); }
+         if (key = 131) { let direction = 1; }
+         if (key = 133) { let direction = 2; }
+         if (key = 130) { let direction = 3; }
+         if (key = 132) { let direction = 4; }
 
          // waits for the key to be released
          while (~(key = 0)) {
             let key = Keyboard.keyPressed();
             do moveBird();
-            do updateObjects();  // Actualizar objetos cayendo
+            do updateObjects();
+            do updateWalls(); // NUEVO
          }
-     } // while
+     }
      
-     // Mostrar mensaje final
      do showGameOver();
-     
      return;
    }
    
@@ -153,7 +177,6 @@ class BirdGame {
       var FallingObject obj;
       var int birdX, birdY, birdSize;
       
-      // Obtener posición del pájaro para detección de colisiones
       let birdX = bird.getX();
       let birdY = bird.getY();
       let birdSize = bird.getSize();
@@ -161,10 +184,8 @@ class BirdGame {
       let objectCount = objectCount + 1;
       let timeCounter = timeCounter + 1;
       
-      // Manejar reactivación de objetos
       if (reactivationTimer > 0) {
          let reactivationTimer = reactivationTimer - 1;
-         // Cuando el timer llegue a 0, reactivar todos los objetos inactivos
          if (reactivationTimer = 0) {
             let i = 0;
             while (i < maxObjects) {
@@ -179,21 +200,17 @@ class BirdGame {
          }
       }
       
-      // Incrementar score cada 2 segundos
-      // Aproximadamente 200 llamadas a updateObjects = 2 segundos
       if (timeCounter > 100) {
          let score = score + 1;
          do updateScore();
          let timeCounter = 0;
       }
       
-      // Crear nuevo objeto solo al inicio si no existen
       if (objectCount > 50) {
          do createRandomObject();
          let objectCount = 0;
       }
       
-      // Actualizar todos los objetos existentes
       let i = 0;
       while (i < maxObjects) {
          let obj = objects[i];
@@ -201,13 +218,10 @@ class BirdGame {
             if (obj.isActive()) {
                do obj.fall();
                
-               // Verificar colisión con avión
                if (obj.checkCollision(birdX, birdY, birdSize)) {
-                  // Colisión con avión - restar una vida
                   let lives = lives - 1;
                   do updateLives();
                   do obj.deactivate();
-                  // Iniciar timer de reactivación (aproximadamente 1 segundo)
                   let reactivationTimer = 100;
                }
             }
@@ -225,35 +239,82 @@ class BirdGame {
       var int randomX, randomSpeed;
       var boolean created;
       
-      // Buscar un slot vacío en el array
       let i = 0;
       let created = false;
       while ((i < maxObjects) & (~created)) {
          if (objects[i] = 0) {
-            // Generar valores "aleatorios" usando el índice del slot y objectCount
-            // Esto crea diferentes posiciones para cada slot
             let randomX = ((i * 97) + (objectCount * 37) + 50);
-            // Asegurar que X esté entre 0 y 480
-            while (randomX > 480) {
-               let randomX = randomX - 480;
-            }
-            while (randomX < 0) {
-               let randomX = randomX + 480;
-            }
-            
-            let randomSpeed = 1;  
-            
-            // Crear solo aviones (tipo 0)
+            while (randomX > 480) { let randomX = randomX - 480; }
+            while (randomX < 0) { let randomX = randomX + 480; }
+            let randomSpeed = 1;
             let newObj = FallingObject.new(randomX, 0, randomSpeed);
             let objects[i] = newObj;
             let created = true;
          }
          let i = i + 1;
       }
+      return;
+   }
+
+   // --- LÓGICA DE MUROS HORIZONTALES (NUEVOS MÉTODOS) ---
+
+   /** Actualiza todos los muros que caen y crea nuevos. */
+   method void updateWalls() {
+      var int i;
+      var HorizontalWall wall;
+      var int birdX, birdY, birdSize;
       
+      let birdX = bird.getX();
+      let birdY = bird.getY();
+      let birdSize = bird.getSize();
+      
+      let wallCounter = wallCounter + 1;
+      
+      // Crear nuevo muro cada cierto tiempo
+      if (wallCounter > 200) {
+         do createRandomWall();
+         let wallCounter = 0;
+      }
+      
+      let i = 0;
+      while (i < maxWalls) {
+         let wall = horizontalWalls[i];
+         if (~(wall = 0)) {
+            do wall.fall();
+            
+            if (wall.collidesWith(birdX, birdY, birdSize)) {
+               let lives = 0; // Game Over instantáneo
+            }
+         }
+         let i = i + 1;
+      }
+      return;
+   }
+   
+   /** Crea un muro horizontal aleatorio. */
+   method void createRandomWall() {
+      var int i;
+      var HorizontalWall newWall;
+      var int randomGapX, randomSpeed;
+      var boolean created;
+      
+      let i = 0;
+      let created = false;
+      while ((i < maxWalls) & (~created)) {
+         if (horizontalWalls[i] = 0) {
+            // Generar X aleatoria para el hueco
+            let randomGapX = ((i * 157) + (wallCounter * 41) + 70);
+            while (randomGapX > 400) { let randomGapX = randomGapX - 400; }
+            while (randomGapX < 20) { let randomGapX = randomGapX + 20; }
+            
+            let randomSpeed = 2;
+            
+            let newWall = HorizontalWall.new(0, randomGapX, randomSpeed);
+            let horizontalWalls[i] = newWall;
+            let created = true;
+         }
+         let i = i + 1;
+      }
       return;
    }
 }
-
-
-
