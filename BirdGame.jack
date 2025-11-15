@@ -69,7 +69,7 @@ class BirdGame {
       if (direction = 2) { do bird.moveDown(); }
       if (direction = 3) { do bird.moveLeft(); }
       if (direction = 4) { do bird.moveRight(); }
-      do Sys.wait(5);  // delays the next movement
+      do Sys.wait(8);  // delays the next movement
       return;
    }
 
