@@ -175,21 +175,21 @@ class Bird {
       return;
    }
 
-   /** Moves the Bird left by 2 pixels (if possible). */
+   /** Moves the Bird left by 4 pixels (if possible). */
    method void moveLeft() {
-      if (x > 1) {
+      if (x > 4) {
          do erase();
-         let x = x - 2;
+         let x = x - 4;
          do draw();
       }
       return;
    }
 
-   /** Moves the Bird right by 2 pixels (if possible). */
+   /** Moves the Bird right by 4 pixels (if possible). */
    method void moveRight() {
-      if ((x + size) < 510) {
+      if ((x + size) < 506) {
          do erase();
-         let x = x + 2;
+         let x = x + 4;
          do draw();
       }
       return;
