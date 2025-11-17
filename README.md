@@ -172,6 +172,6 @@ Proyecto desarrollado para el curso de Organización de Computadores por:
 
 Puedes ver una demostración y explicación completa del juego en el siguiente video:
 
-[Enlace al video](#)
+[Enlace al video](https://youtu.be/beaHDHwc1ks)
 
 **¡Disfruta jugando FlipFall!**
