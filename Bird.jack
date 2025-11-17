@@ -1,9 +1,11 @@
 class Bird {
 
-   field int x, y; // screen location of the top-left corner of this Bird
-   field int size; // length of this Bird, in pixels
+   // Ubicación en pantalla de la esquina superior izquierda del pájaro
+   field int x, y;
+   // Tamaño del pájaro en píxeles
+   field int size;
 
-   /** Constructs and draws a new Bird with a given location and size. */
+   // Construye y dibuja un nuevo pájaro con una ubicación y tamaño dado.
    constructor Bird new(int ax, int ay, int asize) {
       let x = ax;
       let y = ay;
@@ -12,19 +14,22 @@ class Bird {
       return this;
    }
 
-   /** Disposes this Bird. */
+   // Libera la memoria del pájaro.
    method void dispose() {
       do Memory.deAlloc(this);
       return;
    }
 
-   /** Draws this Bird in its current (x,y) location */
+   // Dibuja el pájaro en su ubicación actual (x,y)
    method void draw() {
       var int memAddress;
-      // Map (x,y) to screen memory word address.
-      // Each word is 16 horizontal pixels, and each screen row has 32 words.
+      // Calcular la dirección de memoria base para dibujar el pájaro
+      // 16384 es la dirección base de la pantalla en memoria
+      // Cada fila tiene 32 palabras y cada palabra representa 16 píxeles horizontales
       let memAddress = 16384 + (y * 32) + (x / 16);
-      // column 0
+      // Dibujar el sprite del pájaro usando Memory.poke para escribir directamente en memoria
+      // El sprite está dividido en 2 columnas de 16 píxeles cada una
+      // Columna 0
       do Memory.poke(memAddress, -4096);
       do Memory.poke(memAddress +32, -4096);
       do Memory.poke(memAddress +64, 3840);
@@ -49,7 +54,7 @@ class Bird {
       do Memory.poke(memAddress +672, 15360);
       do Memory.poke(memAddress +704, -16384);
       do Memory.poke(memAddress +736, -16384);
-      // column 1
+      // Columna 1
       do Memory.poke(memAddress +1, 63);
       do Memory.poke(memAddress +33, 63);
       do Memory.poke(memAddress +65, 204);
@@ -77,12 +82,13 @@ class Bird {
       return;
    }
 
-   /** Erases this Bird. */
+   // Borra el pájaro de la pantalla.
    method void erase() {
       var int memAddress;
-      // Erase the sprite by writing zeros to the same screen memory words
+      // Borrar el pájaro escribiendo ceros en todas las posiciones de memoria que ocupa
+      // Esto limpia los píxeles del sprite en la pantalla
       let memAddress = 16384 + (y * 32) + (x / 16);
-      // column 0
+      // Columna 0
       do Memory.poke(memAddress, 0);
       do Memory.poke(memAddress + 32, 0);
       do Memory.poke(memAddress + 64, 0);
@@ -107,7 +113,7 @@ class Bird {
       do Memory.poke(memAddress + 672, 0);
       do Memory.poke(memAddress + 704, 0);
       do Memory.poke(memAddress + 736, 0);
-      // column 1
+      // Columna 1
       do Memory.poke(memAddress + 1, 0);
       do Memory.poke(memAddress + 33, 0);
       do Memory.poke(memAddress + 65, 0);
@@ -135,28 +141,9 @@ class Bird {
       return;
    }
 
-    /** Increments the Bird size by 2 pixels (if possible). */
-   method void incSize() {
-      if (((y + size) < 254) & ((x + size) < 510)) {
-         do erase();
-         let size = size + 2;
-         do draw();
-      }
-      return;
-   }
-
-   /** Decrements the Bird size by 2 pixels (if possible). */
-   method void decSize() {
-      if (size > 2) {
-         do erase();
-         let size = size - 2;
-         do draw();
-      }
-      return;
-   }
-
-   /** Moves this Bird up by 2 pixels (if possible). */
+   // Mueve el pájaro hacia arriba 2 píxeles (si es posible).
    method void moveUp() {
+      // Verificar que no se salga del borde superior de la pantalla
       if (y > 1) {
          do erase();
          let y = y - 2;
@@ -165,8 +152,9 @@ class Bird {
       return;
    }
 
-   /** Moves the Bird down by 2 pixels (if possible). */
+   // Mueve el pájaro hacia abajo 2 píxeles (si es posible).
    method void moveDown() {
+      // Verificar que no se salga del borde inferior de la pantalla (altura 256 - margen)
       if ((y + size) < 254) {
          do erase();
          let y = y + 2;
@@ -175,8 +163,9 @@ class Bird {
       return;
    }
 
-   /** Moves the Bird left by 4 pixels (if possible). */
+   // Mueve el pájaro hacia la izquierda 4 píxeles (si es posible).
    method void moveLeft() {
+      // Verificar que no se salga del borde izquierdo de la pantalla
       if (x > 4) {
          do erase();
          let x = x - 4;
@@ -185,8 +174,9 @@ class Bird {
       return;
    }
 
-   /** Moves the Bird right by 4 pixels (if possible). */
+   // Mueve el pájaro hacia la derecha 4 píxeles (si es posible).
    method void moveRight() {
+      // Verificar que no se salga del borde derecho de la pantalla (ancho 512 - margen)
       if ((x + size) < 506) {
          do erase();
          let x = x + 4;
@@ -195,7 +185,7 @@ class Bird {
       return;
    }
    
-   /** Getters para obtener la posición y tamaño del pájaro */
+   // Getters para obtener la posición y tamaño del pájaro
    method int getX() {
       return x;
    }

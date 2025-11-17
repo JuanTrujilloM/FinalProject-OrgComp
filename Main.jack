@@ -1,8 +1,13 @@
+// Clase principal que inicia el juego FlipFall
 class Main {
+    // Función principal que ejecuta el programa
     function void main() {
         var BirdGame game;
+        // Crear una nueva instancia del juego
         let game = BirdGame.new();
+        // Ejecutar el juego
         do game.run();
+        // Liberar la memoria al finalizar
         do game.dispose();
         return;
     }

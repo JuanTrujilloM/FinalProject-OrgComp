@@ -1,15 +1,18 @@
-/**
- * Representa un obstáculo HORIZONTAL que cae verticalmente.
- * Consiste en dos muros (izquierdo y derecho) con un hueco vertical en medio.
- */
+// Representa un obstáculo HORIZONTAL que cae verticalmente.
+// Consiste en dos muros (izquierdo y derecho) con un hueco vertical en medio.
 class HorizontalWall {
-    field int y;          // Posición vertical (cambia al caer).
-    field int height;     // Grosor del muro.
-    field int gap_x;      // Posición 'x' donde empieza el hueco.
-    field int gap_width;  // Ancho del hueco.
-    field int speed;      // Velocidad de caída.
+    // Posición vertical (cambia al caer)
+    field int y;
+    // Grosor del muro
+    field int height;
+    // Posición X donde empieza el hueco
+    field int gap_x;
+    // Ancho del hueco
+    field int gap_width;
+    // Velocidad de caída
+    field int speed;
 
-    /** Constructor: Crea un nuevo muro horizontal. */
+    // Constructor: Crea un nuevo muro horizontal.
     constructor HorizontalWall new(int initial_y, int initial_gap_x, int initial_speed) {
         let y = initial_y;
         let gap_x = initial_gap_x;
@@ -21,15 +24,15 @@ class HorizontalWall {
         return this;
     }
 
-    /** Libera la memoria. */
+    // Libera la memoria del muro.
     method void dispose() {
         do Memory.deAlloc(this);
         return;
     }
 
-    /** Dibuja el muro izquierdo y el derecho. */
+    // Dibuja el muro izquierdo y el derecho.
     method void draw() {
-        // Dibuja solo si está dentro de los límites verticales para evitar errores.
+        // Dibuja solo si está dentro de los límites verticales de la pantalla para evitar errores.
         if ((y > -1) & ((y + height) < 256)) {
             do Screen.setColor(true);
             do Screen.drawRectangle(0, y, gap_x, y + height);
@@ -38,9 +41,9 @@ class HorizontalWall {
         return;
     }
 
-    /** Borra los muros. */
+    // Borra los muros de la pantalla.
     method void erase() {
-        // Borra solo si está dentro de los límites para evitar errores.
+        // Borra solo si está dentro de los límites de la pantalla para evitar errores.
         if ((y > -1) & ((y + height) < 256)) {
             do Screen.setColor(false);
             do Screen.drawRectangle(0, y, gap_x, y + height);
@@ -50,13 +53,14 @@ class HorizontalWall {
         return;
     }
 
-    /** Mueve el muro hacia abajo. */
+    // Mueve el muro hacia abajo.
     method void fall() {
         do erase();
         let y = y + speed;
+        // Si sale de la pantalla por abajo, reposicionar arriba
         if (y > 255) {
             let y = 0;
-            // Cambiar la posición del hueco para el siguiente ciclo.
+            // Cambiar la posición del hueco de forma pseudo-aleatoria para el siguiente ciclo
             let gap_x = (gap_x + 131);
             while (gap_x > 400) {
                 let gap_x = gap_x - 400;
@@ -69,7 +73,7 @@ class HorizontalWall {
         return;
     }
 
-    /** Comprueba colisión con el pájaro. */
+    // Comprueba colisión con el pájaro.
     method boolean collidesWith(int bird_x, int bird_y, int bird_size) {
         var boolean y_collision, x_collision;
         var int bird_right, bird_bottom;
@@ -77,11 +81,11 @@ class HorizontalWall {
         let bird_right = bird_x + bird_size;
         let bird_bottom = bird_y + bird_size;
 
-        // 1. Comprobar si el pájaro está a la misma altura que el muro.
+        // 1. Comprobar si el pájaro está a la misma altura que el muro
         let y_collision = ~((bird_bottom < y) | (bird_y > (y + height)));
 
         if (y_collision) {
-            // 2. Si está a la misma altura, comprobar si está fuera del hueco.
+            // 2. Si está a la misma altura, comprobar si está fuera del hueco
             let x_collision = (bird_x < gap_x) | (bird_right > (gap_x + gap_width));
             if (x_collision) {
                 return true;

@@ -1,25 +1,35 @@
  
 class BirdGame {
-   field Bird bird; // the Bird of this game
-   field int direction; // the Bird's current direction: 
-                        // 0=none, 1=up, 2=down, 3=left, 4=right
-   field Array objects; // Array de objetos cayendo
-   field int maxObjects; // Número máximo de objetos
-   field int objectCount; // Contador para crear nuevos objetos
-   field int lives; // Vidas del jugador
-   field int score; // Puntuación del jugador
-   field int timeCounter; // Contador de tiempo para el score
-   field int reactivationTimer; // Contador para reactivar objetos
+   // El pájaro de este juego
+   field Bird bird;
+   // Dirección actual del pájaro: 0=ninguna, 1=arriba, 2=abajo, 3=izquierda, 4=derecha
+   field int direction;
+   // Array de objetos cayendo
+   field Array objects;
+   // Número máximo de objetos
+   field int maxObjects;
+   // Contador para crear nuevos objetos
+   field int objectCount;
+   // Vidas del jugador
+   field int lives;
+   // Puntuación del jugador
+   field int score;
+   // Contador de tiempo para el score
+   field int timeCounter;
+   // Contador para reactivar objetos
+   field int reactivationTimer;
 
-
+   // Array de muros horizontales
    field Array horizontalWalls;
+   // Número máximo de muros
    field int maxWalls;
+   // Contador para crear nuevos muros
    field int wallCounter;
 
-   /** Constructs a new Bird game. */
+   // Construye un nuevo juego BirdGame.
    constructor BirdGame new() {
       var int i;
-      // The initial Bird is located in the middle of the screen (256,128), has size 30, and is not moving.
+      // El pájaro inicial está ubicado en el centro de la pantalla (256,128), con tamaño 30 y sin moverse.
       let bird = Bird.new(256, 128, 30);
       let direction = 0;
 
@@ -27,7 +37,7 @@ class BirdGame {
       let maxObjects = 5;  // Máximo 5 objetos en pantalla a la vez
       let objects = Array.new(maxObjects);
       let objectCount = 0;
-      let lives = 3;  // Comenzar con 3 vidas
+      let lives = 1;  // Comenzar con 1 vidas
       let score = 0;  // Comenzar con score 0
       let timeCounter = 0;  // Inicializar contador de tiempo
       let reactivationTimer = 0;  // Sin objetos por reactivar al inicio
@@ -39,6 +49,7 @@ class BirdGame {
          let i = i + 1;
       }
 
+      // Inicializar sistema de muros horizontales
       let maxWalls = 3;
       let horizontalWalls = Array.new(maxWalls);
       let wallCounter = 0;
@@ -49,15 +60,14 @@ class BirdGame {
          let i = i + 1;
       }
 
-      // Mostrar título e instrucciones
+      // Mostrar título y Score
       do showTitle();
-      // do updateLives();
       do updateScore();
       
       return this;
    }
 
-   /** Disposes this game. */
+   // Libera la memoria del juego.
    method void dispose() {
       var int i;
       var FallingObject obj;
@@ -85,50 +95,47 @@ class BirdGame {
       return;
    }
 
-   /** Moves the Bird in the current direction. */
+   // Mueve el pájaro en la dirección actual.
    method void moveBird() {
       if (direction = 1) { do bird.moveUp(); }
       if (direction = 2) { do bird.moveDown(); }
       if (direction = 3) { do bird.moveLeft(); }
       if (direction = 4) { do bird.moveRight(); }
-      do Sys.wait(8);  // delays the next movement
+      do Sys.wait(8);  // Retraso para el siguiente movimiento
       return;
    }
 
-   /** Runs the game: handles the user's inputs and moves the Bird accordingly */
+   // Ejecuta el juego: maneja las entradas del usuario y mueve el pájaro en consecuencia.
    method void run() {
-      var char key;  // the key currently pressed by the user
+      var char key;  // La tecla actualmente presionada por el usuario
       var boolean exit;
       let exit = false;
       
       while ((~exit) & (lives > 0)) {
          // Mostrar título e instrucciones
          do showTitle();
-         // do updateLives();
          do updateScore();
-         // waits for a key to be pressed
+         // Esperar a que se presione una tecla
          while (key = 0) {
             let key = Keyboard.keyPressed();
             do moveBird();
             do updateObjects();  // Actualizar objetos cayendo
             do updateWalls();
          }
-         if (key = 81)  { let exit = true; }     // q key
-         if (key = 90)  { do bird.decSize(); } // z key
-         if (key = 88)  { do bird.incSize(); } // x key
-         if (key = 131) { let direction = 1; }   // up arrow
-         if (key = 133) { let direction = 2; }   // down arrow
-         if (key = 130) { let direction = 3; }   // left arrow
-         if (key = 132) { let direction = 4; }   // right arrow
+         if (key = 81)  { let exit = true; }     // Tecla Q
+         if (key = 131) { let direction = 1; }   // Flecha arriba
+         if (key = 133) { let direction = 2; }   // Flecha abajo
+         if (key = 130) { let direction = 3; }   // Flecha izquierda
+         if (key = 132) { let direction = 4; }   // Flecha derecha
 
-         // waits for the key to be released
+         // Esperar a que se suelte la tecla
          while (~(key = 0)) {
             let key = Keyboard.keyPressed();
             do moveBird();
             do updateObjects();  // Actualizar objetos cayendo
             do updateWalls();
          }
-      } // while
+      } // Fin del loop principal
 
       // Mostrar mensaje final
       do showGameOver();
@@ -136,18 +143,16 @@ class BirdGame {
       return;
    }
 
-   /** Muestra el título del juego */
+   // Muestra el título del juego.
    method void showTitle() {
       do Output.moveCursor(0, 1);
       do Output.printString("Score: ");
       do Output.moveCursor(0, 29);
       do Output.printString("FLIPFALL");
-      // do Output.moveCursor(0, 55);
-      // do Output.printString("Lives: ");
       return;
    }
    
-   /** Actualiza el score en pantalla */
+   // Actualiza el score en pantalla.
    method void updateScore() {
       do Output.moveCursor(0, 8);
       do Output.printString("      ");  // Limpiar el área
@@ -156,16 +161,7 @@ class BirdGame {
       return;
    }
 
-   /** Actualiza las vidas en pantalla */
-   method void updateLives() {
-      do Output.moveCursor(0, 62);
-      do Output.printString("   ");  // Limpiar el área
-      do Output.moveCursor(0, 62);
-      do Output.printInt(lives);
-      return;
-   }
-
-   /** Muestra el mensaje de Game Over */
+   // Muestra el mensaje de Game Over.
    method void showGameOver() {
       do Output.moveCursor(10, 27);
       do Output.printString("GAME OVER!");
@@ -175,7 +171,7 @@ class BirdGame {
       return;
    }
 
-   /** Actualiza todos los objetos cayendo y crea nuevos */
+   // Actualiza todos los objetos cayendo y crea nuevos.
    method void updateObjects() {
       var int i;
       var FallingObject obj;
@@ -189,7 +185,7 @@ class BirdGame {
       let objectCount = objectCount + 1;
       let timeCounter = timeCounter + 1;
 
-      // Manejar reactivación de objetos
+      // Manejar reactivación de objetos después de ser recolectados
       if (reactivationTimer > 0) {
          let reactivationTimer = reactivationTimer - 1;
          // Cuando el timer llegue a 0, reactivar todos los objetos inactivos
@@ -207,15 +203,15 @@ class BirdGame {
          }
       }
       
-      // Incrementar score cada 2 segundos
-      // Aproximadamente 200 llamadas a updateObjects = 2 segundos
+      // Incrementar score cada 2 segundos aproximadamente
+      // (100 llamadas a updateObjects ≈ 2 segundos)
       if (timeCounter > 100) {
          let score = score + 1;
          do updateScore();
          let timeCounter = 0;
       }
       
-      // Crear nuevo objeto solo al inicio si no existen
+      // Crear nuevo objeto cada cierto tiempo
       if (objectCount > 50) {
          do createRandomObject();
          let objectCount = 0;
@@ -229,24 +225,14 @@ class BirdGame {
             if (obj.isActive()) {
                do obj.fall();
                
-               // Verificar colisión con avión
+               // Verificar colisión con el pájaro
                if (obj.checkCollision(birdX, birdY, birdSize)) {
-                  // Colisión con avión - restar una vida
-                  if (obj.type() = 0) {        // obstáculo
-                     let lives = lives - 1;
-                     do updateLives();
-                  }
-
-                  if (obj.type() = 1) {        // corazón
-                     let lives = lives + 1;
-                     do updateLives();
-                  }
-
-                  if (obj.type() = 2) {        // moneda
+                  if (obj.type() = 2) {        // Moneda recolectada
                      let score = score + 5;
                      do updateScore();
                   }
 
+                  // Desactivar el objeto y programar su reactivación
                   do obj.deactivate();
                   let reactivationTimer = 100;
                }
@@ -258,12 +244,11 @@ class BirdGame {
       return;
    }
 
-   /** Crea un objeto aleatorio en una posición aleatoria */
+   // Crea un objeto aleatorio en una posición aleatoria.
    method void createRandomObject() {
-      var int i, randomX, randomSpeed, r;
+      var int i, randomX, randomSpeed;
       var FallingObject newObj;
       var boolean created;
-      var int q, mod;
       let i = 0;
       let created = false;
 
@@ -271,42 +256,16 @@ class BirdGame {
 
          if (objects[i] = 0) {
 
+            // Calcular posición X pseudo-aleatoria
             let randomX = ((i * 97) + (objectCount * 37) + 50);
             while (randomX > 480) { let randomX = randomX - 480; }
 
             let randomSpeed = 1;
 
-            // "Aleatorio" de tipo usando timeCounter (pseudo-random)
-            let r = timeCounter + (i * 3);
-
-            // calcular r % 10
-
-            let q = r / 10;
-            let q = q * 10;
-            let mod = r - q;     // mod = r % 10
-
-            // 70% tipo 0
-            /* if (mod < 7) {
-               let newObj = FallingObject.new(randomX, 0, randomSpeed);
-               let objects[i] = newObj;
-               let created = true;
-            }*/
-            // 20% tipo 2
-            // else {
-               // volver a calcular mod si quieres reutilizar, pero no es necesario
-               if (mod < 9) {
-                  let newObj = FallingObject.new(randomX, 2, randomSpeed);
-                  let objects[i] = newObj;
-                  let created = true;
-               }
-               // 10% tipo 1
-               else {
-
-                  let newObj = FallingObject.new(randomX, 1, randomSpeed);
-                  let objects[i] = newObj;
-                  let created = true;
-               }
-            // } 
+            // Crear solo monedas (tipo 2)
+            let newObj = FallingObject.new(randomX, 2, randomSpeed);
+            let objects[i] = newObj;
+            let created = true;
 
          }
 
@@ -316,6 +275,7 @@ class BirdGame {
       return;
    }
 
+   // Actualiza los muros horizontales y verifica colisiones.
    method void updateWalls() {
       var int i;
       var HorizontalWall wall;
@@ -327,17 +287,20 @@ class BirdGame {
       
       let wallCounter = wallCounter + 1;
 
+      // Crear nuevo muro cada cierto tiempo
       if (wallCounter > 200) {
          do createRandomWall();
          let wallCounter = 0;
       }
       
+      // Actualizar y verificar colisiones con cada muro
       let i = 0;
       while (i < maxWalls) {
          let wall = horizontalWalls[i];
          if (~(wall = 0)) {
             do wall.fall();
 
+            // Si hay colisión, terminar el juego
             if (wall.collidesWith(birdX, birdY, birdSize)) {
                let lives = 0;
             }
@@ -347,6 +310,7 @@ class BirdGame {
       return;
    }
 
+   // Crea un muro horizontal en una posición aleatoria.
    method void createRandomWall() {
       var int i;
       var HorizontalWall newWall;
@@ -359,6 +323,7 @@ class BirdGame {
       while ((i < maxWalls) & (~created)) {
          if (horizontalWalls[i] = 0) {
 
+            // Calcular posición X del hueco de forma pseudo-aleatoria
             let randomGapX = ((i * 157) + (wallCounter * 41) + 70);
             while (randomGapX > 400) { let randomGapX = randomGapX - 400; }
             while (randomGapX < 20)  { let randomGapX = randomGapX + 20; }
